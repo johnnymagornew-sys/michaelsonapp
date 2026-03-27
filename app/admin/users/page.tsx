@@ -4,7 +4,7 @@ import { toDateString } from '@/lib/utils/dates'
 
 export const dynamic = 'force-dynamic'
 
-export default async function UsersPage() {
+export default async function UsersPage({ searchParams }: { searchParams: { filter?: string } }) {
   const supabase = createClient()
   const today = toDateString(new Date())
 
@@ -67,5 +67,5 @@ export default async function UsersPage() {
     permanentEnrollments: enrollmentsMap[p.id] ?? [],
   }))
 
-  return <UsersView users={usersWithSubs} today={today} recurringClasses={recurringClasses ?? []} />
+  return <UsersView users={usersWithSubs} today={today} recurringClasses={recurringClasses ?? []} initialFilter={searchParams.filter ?? 'all'} />
 }

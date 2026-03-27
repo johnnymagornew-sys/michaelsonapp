@@ -58,9 +58,9 @@ export default async function AdminDashboard() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard label="תלמידים רשומים" value={totalClients ?? 0} />
-        <StatCard label="מנויים פעילים" value={activeSubscriptions ?? 0} />
-        <StatCard label="מנויים שפגו" value={expiredSubs ?? 0} />
+        <StatCard label="תלמידים רשומים" value={totalClients ?? 0} href="/admin/users" />
+        <StatCard label="מנויים פעילים" value={activeSubscriptions ?? 0} href="/admin/users?filter=active" />
+        <StatCard label="מנויים שפגו" value={expiredSubs ?? 0} href="/admin/users?filter=expired" />
         <StatCard label="הזמנות השבוע" value={weekBookings ?? 0} />
       </div>
 
@@ -137,11 +137,24 @@ export default async function AdminDashboard() {
   )
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="bg-[#1C1C1C] rounded-lg p-4 border-r-4 border-[#2a2a2a]">
+function StatCard({ label, value, href }: { label: string; value: number; href?: string }) {
+  const inner = (
+    <>
       <p className="text-4xl font-black text-white">{value.toLocaleString()}</p>
       <p className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">{label}</p>
+      {href && <p className="text-[10px] text-red-600 font-bold mt-2 uppercase tracking-wider">לחץ לצפייה ›</p>}
+    </>
+  )
+  if (href) {
+    return (
+      <Link href={href} className="bg-[#1C1C1C] rounded-lg p-4 border-r-4 border-red-700 block active:opacity-80">
+        {inner}
+      </Link>
+    )
+  }
+  return (
+    <div className="bg-[#1C1C1C] rounded-lg p-4 border-r-4 border-[#2a2a2a]">
+      {inner}
     </div>
   )
 }

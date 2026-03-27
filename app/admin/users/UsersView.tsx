@@ -13,9 +13,10 @@ interface Props {
   users: any[]
   today: string
   recurringClasses: any[]
+  initialFilter?: string
 }
 
-export default function UsersView({ users, today, recurringClasses }: Props) {
+export default function UsersView({ users, today, recurringClasses, initialFilter = 'all' }: Props) {
   const router = useRouter()
   const supabase = createClient()
   const [search, setSearch] = useState('')
@@ -42,10 +43,13 @@ export default function UsersView({ users, today, recurringClasses }: Props) {
   }
 
   const filtered = users
-    .filter(u =>
-      (u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search)) &&
-      (filterBelt === 'all' || u.belt === filterBelt)
-    )
+    .filter(u => {
+      if (!(u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search))) return false
+      if (filterBelt !== 'all' && u.belt !== filterBelt) return false
+      if (initialFilter === 'expired') return u.subscription && u.subscription.end_date < today
+      if (initialFilter === 'active') return u.subscription && u.subscription.end_date >= today && u.subscription.start_date <= today
+      return true
+    })
     .sort((a, b) => {
       if (sortBy === 'name') {
         return (a.full_name ?? '').localeCompare(b.full_name ?? '', 'he')
@@ -224,7 +228,16 @@ export default function UsersView({ users, today, recurringClasses }: Props) {
 
   return (
     <div className="px-4 py-5">
-      <h1 className="text-2xl font-black text-white mb-4">משתמשים</h1>
+      <div className="mb-4">
+        <h1 className="text-2xl font-black text-white">
+          {initialFilter === 'expired' ? 'מנויים שפגו' : initialFilter === 'active' ? 'מנויים פעילים' : 'משתמשים'}
+        </h1>
+        {initialFilter !== 'all' && (
+          <p className="text-[10px] uppercase tracking-widest text-red-500 font-bold mt-0.5">
+            מסונן — {initialFilter === 'expired' ? 'פג תוקף' : 'פעיל'}
+          </p>
+        )}
+      </div>
 
       {/* Search */}
       <div className="relative mb-4">
