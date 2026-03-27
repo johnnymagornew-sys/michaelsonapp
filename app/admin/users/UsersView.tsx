@@ -4,16 +4,18 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
-import { SUBSCRIPTION_LABELS, SubscriptionType, Belt, BELT_LABELS, BELT_ORDER, BELT_COLORS, AGE_GROUPS, AgeGroup } from '@/types'
+import { SUBSCRIPTION_LABELS, SubscriptionType, Belt, BELT_LABELS, BELT_ORDER, BELT_COLORS, AGE_GROUPS, AgeGroup, DAY_NAMES, CLASS_TYPE_COLORS, ClassType } from '@/types'
+import { formatTime } from '@/lib/utils/dates'
 import BeltIcon from '@/components/ui/BeltIcon'
 import { formatDateHebrew, isSubscriptionActive } from '@/lib/utils/dates'
 
 interface Props {
   users: any[]
   today: string
+  recurringClasses: any[]
 }
 
-export default function UsersView({ users, today }: Props) {
+export default function UsersView({ users, today, recurringClasses }: Props) {
   const router = useRouter()
   const supabase = createClient()
   const [search, setSearch] = useState('')
@@ -185,6 +187,37 @@ export default function UsersView({ users, today }: Props) {
       showToast('המנוי בוטל', 'success')
       startTransition(() => router.refresh())
     }
+  }
+
+  async function addPermanentEnrollment(userId: string, classId: string) {
+    setLoading(true)
+    const today = new Date().toISOString().split('T')[0]
+    // Add enrollment record
+    await supabase.from('permanent_enrollments').insert({ user_id: userId, class_id: classId })
+    // Book all future occurrences not already booked
+    const { data: futureOccs } = await supabase
+      .from('class_occurrences')
+      .select('id')
+      .eq('class_id', classId)
+      .gte('date', today)
+      .eq('is_cancelled', false)
+    if (futureOccs && futureOccs.length > 0) {
+      await supabase.from('bookings').upsert(
+        futureOccs.map(o => ({ user_id: userId, occurrence_id: o.id })),
+        { onConflict: 'user_id,occurrence_id', ignoreDuplicates: true }
+      )
+    }
+    setLoading(false)
+    showToast('התלמיד שובץ לאימון', 'success')
+    startTransition(() => router.refresh())
+  }
+
+  async function removePermanentEnrollment(enrollmentId: string) {
+    setLoading(true)
+    await supabase.from('permanent_enrollments').delete().eq('id', enrollmentId)
+    setLoading(false)
+    showToast('השיבוץ הוסר', 'success')
+    startTransition(() => router.refresh())
   }
 
   const inputClass = "w-full bg-[#242424] border border-[#3a3a3a] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-600 transition-colors"
@@ -434,6 +467,45 @@ export default function UsersView({ users, today }: Props) {
                 </div>
               )}
             </div>
+
+            {/* Permanent enrollments */}
+            {recurringClasses.length > 0 && (
+              <div>
+                <p className="text-gray-400 text-sm font-semibold mb-2">שיבוץ קבוע לאימונים</p>
+                <div className="space-y-2 max-h-52 overflow-y-auto">
+                  {recurringClasses.map(cls => {
+                    const enrollment = (selectedUser.permanentEnrollments ?? []).find((e: any) => e.class_id === cls.id)
+                    const isEnrolled = !!enrollment
+                    return (
+                      <div key={cls.id} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 border transition-colors ${isEnrolled ? 'bg-emerald-950/30 border-emerald-800/30' : 'bg-[#242424] border-transparent'}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${CLASS_TYPE_COLORS[cls.type as ClassType]}`}>{cls.type}</span>
+                            <span className="text-gray-500 text-[10px]">{DAY_NAMES[cls.day_of_week]} · {formatTime(cls.start_time)}</span>
+                          </div>
+                          <p className="text-white text-sm font-medium truncate">{cls.name}</p>
+                          {cls.branch && <p className="text-gray-600 text-xs">{cls.branch}</p>}
+                        </div>
+                        <button
+                          onClick={() => isEnrolled
+                            ? removePermanentEnrollment(enrollment.id)
+                            : addPermanentEnrollment(selectedUser.id, cls.id)
+                          }
+                          disabled={loading}
+                          className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                            isEnrolled
+                              ? 'bg-emerald-700/50 text-emerald-300 hover:bg-red-900/40 hover:text-red-400'
+                              : 'bg-[#333] text-gray-400 hover:bg-red-600 hover:text-white'
+                          }`}
+                        >
+                          {isEnrolled ? '✓ משובץ' : '+ שבץ'}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button

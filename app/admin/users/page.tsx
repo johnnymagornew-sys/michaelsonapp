@@ -40,11 +40,32 @@ export default async function UsersPage() {
     tasksMap[a.user_id].push(a)
   }
 
+  // Get recurring classes
+  const { data: recurringClasses } = await supabase
+    .from('classes')
+    .select('id, name, type, day_of_week, start_time, branch, coach')
+    .eq('is_recurring', true)
+    .eq('is_active', true)
+    .order('day_of_week')
+
+  // Get all permanent enrollments
+  const { data: permanentEnrollments } = await supabase
+    .from('permanent_enrollments')
+    .select('id, user_id, class_id')
+
+  // Map enrollments to user
+  const enrollmentsMap: Record<string, any[]> = {}
+  for (const e of permanentEnrollments ?? []) {
+    if (!enrollmentsMap[e.user_id]) enrollmentsMap[e.user_id] = []
+    enrollmentsMap[e.user_id].push(e)
+  }
+
   const usersWithSubs = (profiles ?? []).map(p => ({
     ...p,
     subscription: subMap[p.id] ?? null,
     tasks: tasksMap[p.id] ?? [],
+    permanentEnrollments: enrollmentsMap[p.id] ?? [],
   }))
 
-  return <UsersView users={usersWithSubs} today={today} />
+  return <UsersView users={usersWithSubs} today={today} recurringClasses={recurringClasses ?? []} />
 }
