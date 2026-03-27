@@ -261,10 +261,14 @@ export default function UsersView({ users, today }: Props) {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 bg-[#2a2a2a] rounded-xl flex items-center justify-center shrink-0">
-                    <span className="text-white font-bold text-sm">
-                      {user.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
+                  <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-[#2a2a2a] flex items-center justify-center">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-white font-bold text-sm">
+                        {user.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                      </span>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-white font-semibold text-sm truncate">{user.full_name}</p>
@@ -307,8 +311,14 @@ export default function UsersView({ users, today }: Props) {
         {selectedUser && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center text-white font-black">
-                {selectedUser.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+              <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-red-600 flex items-center justify-center">
+                {selectedUser.avatar_url ? (
+                  <img src={selectedUser.avatar_url} alt={selectedUser.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-white font-black text-lg">
+                    {selectedUser.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                  </span>
+                )}
               </div>
               <div>
                 <p className="text-white font-bold text-lg">{selectedUser.full_name}</p>
