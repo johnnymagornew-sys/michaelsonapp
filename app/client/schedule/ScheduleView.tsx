@@ -233,6 +233,9 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                           </span>
                         </div>
                         <h3 className="font-bold text-white text-base truncate">{occ.classes.name}</h3>
+                        {(occ.classes.branch || occ.classes.coach) && (
+                          <p className="text-gray-600 text-xs mt-0.5">{occ.classes.branch ?? ''}{occ.classes.coach ? ` · ${occ.classes.coach}` : ''}</p>
+                        )}
                       </div>
                       <div className="text-left mr-3 shrink-0">
                         <p className="text-white font-bold text-base">{formatTime(occ.classes.start_time)}</p>

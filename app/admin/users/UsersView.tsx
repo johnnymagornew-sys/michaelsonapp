@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
-import { SUBSCRIPTION_LABELS, SubscriptionType, Belt, BELT_LABELS, BELT_ORDER, BELT_COLORS } from '@/types'
+import { SUBSCRIPTION_LABELS, SubscriptionType, Belt, BELT_LABELS, BELT_ORDER, BELT_COLORS, AGE_GROUPS, AgeGroup } from '@/types'
 import BeltIcon from '@/components/ui/BeltIcon'
 import { formatDateHebrew, isSubscriptionActive } from '@/lib/utils/dates'
 
@@ -31,6 +31,7 @@ export default function UsersView({ users, today }: Props) {
     type: '8_per_month' as SubscriptionType,
     start_date: today,
     end_date: '',
+    age_group: 'כולם' as AgeGroup,
   })
 
   const showToast = (msg: string, type: 'success' | 'error') => {
@@ -69,9 +70,10 @@ export default function UsersView({ users, today }: Props) {
         type: user.subscription.type,
         start_date: user.subscription.start_date,
         end_date: user.subscription.end_date,
+        age_group: user.subscription.age_group ?? 'כולם',
       })
     } else {
-      setSubForm({ type: '8_per_month', start_date: today, end_date: '' })
+      setSubForm({ type: '8_per_month', start_date: today, end_date: '', age_group: 'כולם' })
     }
     setSubModal(true)
   }
@@ -92,6 +94,7 @@ export default function UsersView({ users, today }: Props) {
           type: subForm.type,
           start_date: subForm.start_date,
           end_date: subForm.end_date,
+          age_group: subForm.age_group,
           assigned_by: user?.id,
         })
         .eq('id', selectedUser.subscription.id)
@@ -105,6 +108,7 @@ export default function UsersView({ users, today }: Props) {
           type: subForm.type,
           start_date: subForm.start_date,
           end_date: subForm.end_date,
+          age_group: subForm.age_group,
           assigned_by: user?.id,
         })
       error = insertError
@@ -471,6 +475,24 @@ export default function UsersView({ users, today }: Props) {
                 className={inputClass}
                 dir="ltr"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">קבוצת גיל</label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {AGE_GROUPS.map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setSubForm(f => ({ ...f, age_group: g }))}
+                    className={`py-2 rounded-xl text-xs font-bold transition-colors ${
+                      subForm.age_group === g ? 'bg-red-600 text-white' : 'bg-[#242424] text-gray-400 border border-[#3a3a3a]'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button

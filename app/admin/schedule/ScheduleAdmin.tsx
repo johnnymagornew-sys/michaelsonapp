@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
-import { CLASS_TYPE_COLORS, ClassType, DAY_NAMES, DAY_NAMES_SHORT } from '@/types'
+import { CLASS_TYPE_COLORS, ClassType, DAY_NAMES, DAY_NAMES_SHORT, BRANCHES, COACHES, AGE_GROUPS, Branch, Coach, AgeGroup } from '@/types'
 import { formatTime, isToday } from '@/lib/utils/dates'
 
 interface Props {
@@ -37,6 +37,9 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
   const [classForm, setClassForm] = useState({
     name: '',
     type: 'MMA' as ClassType,
+    branch: 'מרכז פיס' as Branch,
+    coach: 'שוקי' as Coach,
+    age_group: 'כולם' as AgeGroup,
     start_date: todayStr,
     start_time: '18:00',
     duration_minutes: 60,
@@ -65,6 +68,9 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
     const { data: cls, error } = await supabase.from('classes').insert({
       name: classForm.name,
       type: classForm.type,
+      branch: classForm.branch,
+      coach: classForm.coach,
+      age_group: classForm.age_group,
       day_of_week,
       start_time: classForm.start_time,
       duration_minutes: classForm.duration_minutes,
@@ -238,6 +244,7 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
                         </div>
                         <p className="text-white font-bold">{cls.name}</p>
                         <p className="text-gray-400 text-sm">{formatTime(cls.start_time)} · {cls.duration_minutes} דק'</p>
+                        <p className="text-gray-600 text-xs mt-0.5">{cls.branch ?? ''}{cls.coach ? ` · ${cls.coach}` : ''}{cls.age_group && cls.age_group !== 'כולם' ? ` · גיל ${cls.age_group}` : ''}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-left">
@@ -319,6 +326,26 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
               <option value="בוקסינג">בוקסינג</option>
               <option value="BJJ">BJJ</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">סניף</label>
+            <select value={classForm.branch} onChange={e => setClassForm(f => ({ ...f, branch: e.target.value as Branch }))} className={inputClass}>
+              {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">מאמן</label>
+              <select value={classForm.coach} onChange={e => setClassForm(f => ({ ...f, coach: e.target.value as Coach }))} className={inputClass}>
+                {COACHES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">קבוצת גיל</label>
+              <select value={classForm.age_group} onChange={e => setClassForm(f => ({ ...f, age_group: e.target.value as AgeGroup }))} className={inputClass}>
+                {AGE_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1.5">

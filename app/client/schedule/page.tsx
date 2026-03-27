@@ -25,7 +25,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: { w
     .from('class_occurrences')
     .select(`
       id, class_id, date, is_cancelled, override_capacity,
-      classes (id, name, type, start_time, duration_minutes, max_capacity, day_of_week),
+      classes (id, name, type, start_time, duration_minutes, max_capacity, day_of_week, branch, coach, age_group),
       bookings (id, user_id, cancelled_at)
     `)
     .gte('date', weekStart)
@@ -43,6 +43,13 @@ export default async function SchedulePage({ searchParams }: { searchParams: { w
     .limit(1)
 
   const subscription: Subscription | null = subscriptions?.[0] ?? null
+  const userAgeGroup: string = (subscription as any)?.age_group ?? 'כולם'
+
+  // Filter occurrences by age group
+  const filteredOccurrences = (occurrences ?? []).filter((occ: any) => {
+    const classAgeGroup = occ.classes?.age_group ?? 'כולם'
+    return classAgeGroup === 'כולם' || userAgeGroup === 'כולם' || classAgeGroup === userAgeGroup
+  })
 
   // Get user's active bookings this week
   const { data: myBookings } = await supabase
@@ -56,7 +63,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: { w
 
   return (
     <ScheduleView
-      occurrences={occurrences ?? []}
+      occurrences={filteredOccurrences}
       subscription={subscription}
       myBookings={myBookings ?? []}
       weekDates={weekDates.map(toDateString)}

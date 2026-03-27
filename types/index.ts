@@ -30,6 +30,14 @@ export type SubscriptionType = '8_per_month' | 'unlimited_monthly'
 
 export type ClassType = 'MMA' | 'בוקסינג' | 'BJJ'
 
+export type Branch = 'מרכז פיס' | 'קרית האומנים' | 'נאות שמיר'
+export type Coach = 'שוקי' | 'דניאל'
+export type AgeGroup = 'א-ד' | 'ה-ח' | 'ט-יב' | '18+' | 'כולם'
+
+export const BRANCHES: Branch[] = ['מרכז פיס', 'קרית האומנים', 'נאות שמיר']
+export const COACHES: Coach[] = ['שוקי', 'דניאל']
+export const AGE_GROUPS: AgeGroup[] = ['א-ד', 'ה-ח', 'ט-יב', '18+', 'כולם']
+
 export interface Profile {
   id: string
   full_name: string
