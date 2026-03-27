@@ -43,9 +43,9 @@ export default async function HistoryPage() {
       ) : (
         <div className="space-y-2">
           {validHistory.map(booking => {
-            const occ = booking.class_occurrences
+            const occ = (booking as any).class_occurrences
             if (!occ) return null
-            const cls = occ.classes
+            const cls = (occ as any).classes
             const date = new Date(occ.date + 'T00:00:00')
 
             return (
