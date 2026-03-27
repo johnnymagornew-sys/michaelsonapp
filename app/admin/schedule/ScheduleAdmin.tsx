@@ -80,8 +80,9 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
 
     if (!error && cls) {
       if (classForm.is_recurring) {
-        // Generate occurrences for next 8 weeks starting from chosen date
-        await supabase.rpc('generate_occurrences', { p_class_id: cls.id, p_weeks: 8 })
+        // Generate occurrences until January 1st of next year
+        const nextJan1 = `${new Date().getFullYear() + 1}-01-01`
+        await supabase.rpc('generate_occurrences_until', { p_class_id: cls.id, p_until_date: nextJan1 })
       } else {
         // Create single occurrence on the chosen date
         await supabase.from('class_occurrences').insert({
