@@ -3,6 +3,7 @@ import { toDateString } from '@/lib/utils/dates'
 import { formatTime } from '@/lib/utils/dates'
 import { CLASS_TYPE_COLORS } from '@/types'
 import QuickAddTask from '@/components/admin/QuickAddTask'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,6 +66,23 @@ export default async function AdminDashboard() {
 
       {/* Quick add task */}
       <QuickAddTask clients={clients ?? []} />
+
+      {/* Reports link */}
+      <Link
+        href="/admin/reports"
+        className="w-full flex items-center justify-between bg-[#1a1a1a] border border-[#2a2a2a] hover:border-blue-800/50 rounded-2xl px-4 py-4 transition-colors group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white text-lg">
+            📊
+          </div>
+          <div className="text-right">
+            <p className="text-white font-bold text-sm">דוחות</p>
+            <p className="text-gray-500 text-xs">נוכחות, הכנסות ועוד</p>
+          </div>
+        </div>
+        <span className="text-gray-600 text-lg group-hover:text-gray-400 transition-colors">‹</span>
+      </Link>
 
       {/* Today's classes */}
       <div>
