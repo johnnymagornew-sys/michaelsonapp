@@ -37,6 +37,18 @@ export default async function AdminSchedulePage({ searchParams }: { searchParams
     .gte('date', today)
     .order('date')
 
+  // All client profiles for permanent enrollment management
+  const { data: allUsers } = await supabase
+    .from('profiles')
+    .select('id, full_name, phone, avatar_url')
+    .eq('role', 'client')
+    .order('full_name')
+
+  // All permanent enrollments
+  const { data: permanentEnrollments } = await supabase
+    .from('permanent_enrollments')
+    .select('id, user_id, class_id')
+
   return (
     <ScheduleAdmin
       classes={classes ?? []}
@@ -44,6 +56,8 @@ export default async function AdminSchedulePage({ searchParams }: { searchParams
       upcomingOccurrences={upcomingOccurrences ?? []}
       weekDates={weekDates.map(toDateString)}
       weekOffset={weekOffset}
+      allUsers={allUsers ?? []}
+      permanentEnrollments={permanentEnrollments ?? []}
     />
   )
 }

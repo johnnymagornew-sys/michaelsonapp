@@ -13,9 +13,11 @@ interface Props {
   upcomingOccurrences: any[]
   weekDates: string[]
   weekOffset: number
+  allUsers: any[]
+  permanentEnrollments: any[]
 }
 
-export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrences, weekDates, weekOffset }: Props) {
+export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrences, weekDates, weekOffset, allUsers, permanentEnrollments: initialEnrollments }: Props) {
   const router = useRouter()
   const supabase = createClient()
   const [isPending, startTransition] = useTransition()
@@ -32,6 +34,8 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [tab, setTab] = useState<'week' | 'classes'>('week')
+  const [enrollments, setEnrollments] = useState<any[]>(initialEnrollments)
+  const [enrollTab, setEnrollTab] = useState<'enrolled' | 'add'>('enrolled')
 
   const todayStr = new Date().toISOString().split('T')[0]
   const [classForm, setClassForm] = useState({
@@ -59,6 +63,38 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
       const bC = classes.find((c: any) => c.id === b.class_id)
       return (aC?.start_time ?? '').localeCompare(bC?.start_time ?? '')
     })
+
+  async function addPermanentEnrollment(userId: string, classId: string) {
+    const { data } = await supabase
+      .from('permanent_enrollments')
+      .insert({ user_id: userId, class_id: classId })
+      .select()
+      .single()
+    if (data) {
+      setEnrollments(prev => [...prev, data])
+      // Also book all future occurrences for this user
+      const today = new Date().toISOString().split('T')[0]
+      const futureOccs = await supabase
+        .from('class_occurrences')
+        .select('id')
+        .eq('class_id', classId)
+        .eq('is_cancelled', false)
+        .gte('date', today)
+      if (futureOccs.data) {
+        const bookings = futureOccs.data.map(o => ({ user_id: userId, occurrence_id: o.id }))
+        await supabase.from('bookings').upsert(bookings, { onConflict: 'user_id,occurrence_id', ignoreDuplicates: true })
+      }
+      showToast('התלמיד שובץ קבוע', 'success')
+    }
+  }
+
+  async function removePermanentEnrollment(userId: string, classId: string) {
+    const enrollment = enrollments.find(e => e.user_id === userId && e.class_id === classId)
+    if (!enrollment) return
+    await supabase.from('permanent_enrollments').delete().eq('id', enrollment.id)
+    setEnrollments(prev => prev.filter(e => e.id !== enrollment.id))
+    showToast('השיבוץ הקבוע הוסר', 'success')
+  }
 
   async function createClass() {
     setLoading(true)
@@ -477,6 +513,85 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
                   </div>
                 )}
               </div>
+
+              {/* Permanent enrollments section – only for recurring classes */}
+              {occModal.cls.is_recurring && (() => {
+                const classEnrolled = enrollments.filter(e => e.class_id === occModal.cls.id)
+                const enrolledIds = new Set(classEnrolled.map((e: any) => e.user_id))
+                const notEnrolled = allUsers.filter(u => !enrolledIds.has(u.id))
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-gray-400 text-sm font-semibold">שיבוץ קבוע ({classEnrolled.length})</p>
+                      <div className="flex bg-[#1e1e1e] rounded-lg p-0.5 gap-0.5">
+                        <button
+                          onClick={() => setEnrollTab('enrolled')}
+                          className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${enrollTab === 'enrolled' ? 'bg-red-600 text-white' : 'text-gray-500'}`}
+                        >
+                          משובצים
+                        </button>
+                        <button
+                          onClick={() => setEnrollTab('add')}
+                          className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${enrollTab === 'add' ? 'bg-red-600 text-white' : 'text-gray-500'}`}
+                        >
+                          + הוסף
+                        </button>
+                      </div>
+                    </div>
+                    {enrollTab === 'enrolled' ? (
+                      classEnrolled.length === 0 ? (
+                        <div className="text-center py-4 bg-[#1e1e1e] rounded-xl">
+                          <p className="text-gray-600 text-xs">אין תלמידים משובצים קבוע</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                          {classEnrolled.map((e: any) => {
+                            const user = allUsers.find(u => u.id === e.user_id)
+                            if (!user) return null
+                            return (
+                              <div key={e.id} className="flex items-center gap-3 bg-[#242424] rounded-xl px-3 py-2.5">
+                                <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-black shrink-0">
+                                  {user.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                                </div>
+                                <span className="text-white text-sm flex-1 truncate">{user.full_name}</span>
+                                <button
+                                  onClick={() => removePermanentEnrollment(user.id, occModal.cls.id)}
+                                  className="text-red-500 text-xs font-bold px-2 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/50"
+                                >
+                                  הסר
+                                </button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    ) : (
+                      notEnrolled.length === 0 ? (
+                        <div className="text-center py-4 bg-[#1e1e1e] rounded-xl">
+                          <p className="text-gray-600 text-xs">כל התלמידים כבר משובצים</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                          {notEnrolled.map((user: any) => (
+                            <div key={user.id} className="flex items-center gap-3 bg-[#242424] rounded-xl px-3 py-2.5">
+                              <div className="w-7 h-7 rounded-full bg-[#3a3a3a] flex items-center justify-center text-gray-400 text-xs font-black shrink-0">
+                                {user.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                              </div>
+                              <span className="text-white text-sm flex-1 truncate">{user.full_name}</span>
+                              <button
+                                onClick={() => addPermanentEnrollment(user.id, occModal.cls.id)}
+                                className="text-emerald-400 text-xs font-bold px-2 py-1 rounded-lg bg-emerald-900/20 hover:bg-emerald-900/40"
+                              >
+                                שבץ
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )
+              })()}
 
               {occModal.occ.is_cancelled ? (
                 <button
