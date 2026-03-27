@@ -30,10 +30,13 @@ const config: Config = {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
-        DEFAULT: '0.5rem',
-        lg: '0.75rem',
-        xl: '1rem',
-        '2xl': '1.25rem',
+        DEFAULT: '0.125rem',  // 2px
+        sm: '0.25rem',        // 4px
+        md: '0.375rem',
+        lg: '0.5rem',         // 8px MAX
+        xl: '0.5rem',         // cap at 8px
+        '2xl': '0.5rem',      // cap at 8px
+        full: '9999px',       // keep for actual circles (avatars)
       },
       screens: {
         xs: '390px',

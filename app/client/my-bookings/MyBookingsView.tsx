@@ -43,11 +43,10 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
 
   return (
     <div className="px-4 py-5">
-      <h1 className="text-2xl font-black text-white mb-5">האימונים שלי</h1>
+      <h1 className="font-black uppercase tracking-tight text-2xl text-white mb-5">האימונים שלי</h1>
 
       {upcoming.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <span className="text-4xl mb-3">📅</span>
           <p className="text-gray-500 font-medium">אין אימונים קרובים</p>
           <p className="text-gray-600 text-sm mt-1">הרשם לאימון במערכת השעות</p>
         </div>
@@ -64,24 +63,24 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
             return (
               <div
                 key={booking.id}
-                className={`bg-[#1a1a1a] rounded-2xl border ${
-                  isCancelled ? 'border-gray-800 opacity-60' : 'border-[#2a2a2a]'
-                } overflow-hidden`}
+                className={`bg-[#1C1C1C] rounded-lg overflow-hidden ${
+                  isCancelled ? 'opacity-50 border-r-4 border-[#2a2a2a]' : 'border-r-4 border-red-600'
+                }`}
               >
                 <div className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${CLASS_TYPE_COLORS[cls.type as keyof typeof CLASS_TYPE_COLORS]}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${CLASS_TYPE_COLORS[cls.type as keyof typeof CLASS_TYPE_COLORS]}`}>
                           {cls.type}
                         </span>
                         {isCancelled && (
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-gray-800 text-gray-500">
                             בוטל
                           </span>
                         )}
                       </div>
-                      <h3 className="font-bold text-white text-base">{cls.name}</h3>
+                      <h3 className="font-black uppercase tracking-tight text-base text-white">{cls.name}</h3>
                       <p className="text-gray-400 text-sm mt-1">
                         {date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                         {' · '}
@@ -89,7 +88,7 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
                       </p>
                     </div>
                     <div className="text-left mr-3">
-                      <div className="text-center bg-[#242424] rounded-xl px-3 py-2">
+                      <div className="text-center bg-[#242424] rounded-lg px-3 py-2">
                         <p className="text-xs text-gray-500">{date.toLocaleDateString('he-IL', { month: 'short' })}</p>
                         <p className="text-2xl font-black text-white leading-none">{date.getDate()}</p>
                       </div>
@@ -99,7 +98,7 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
                   {!isCancelled && (
                     <button
                       onClick={() => setCancelModal(booking)}
-                      className={`w-full mt-3 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                      className={`w-full mt-3 py-3 rounded-lg text-xs font-bold uppercase transition-colors ${
                         canCancel
                           ? 'bg-[#242424] text-red-400 hover:bg-red-950/30'
                           : 'bg-[#1e1e1e] text-gray-600 cursor-not-allowed'
@@ -124,8 +123,8 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
       >
         {cancelModal && (
           <div className="space-y-4">
-            <div className="bg-[#242424] rounded-xl p-4">
-              <p className="text-white font-bold">{cancelModal.class_occurrences?.classes?.name}</p>
+            <div className="bg-[#242424] rounded-lg p-4">
+              <p className="text-white font-black uppercase tracking-tight">{cancelModal.class_occurrences?.classes?.name}</p>
               <p className="text-gray-400 text-sm mt-1">
                 {new Date(cancelModal.class_occurrences?.date + 'T00:00:00').toLocaleDateString('he-IL', {
                   weekday: 'long', day: 'numeric', month: 'long'
@@ -138,7 +137,7 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
             <button
               onClick={() => handleCancel(cancelModal)}
               disabled={loading}
-              className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl"
+              className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-tight rounded-lg"
             >
               {loading ? 'מבטל...' : 'כן, בטל'}
             </button>
@@ -147,7 +146,7 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
       </Modal>
 
       {toast && (
-        <div className="fixed top-20 right-4 left-4 z-50 bg-emerald-800 text-emerald-100 px-4 py-3 rounded-xl text-sm font-medium text-center animate-fade-in">
+        <div className="fixed top-20 right-4 left-4 z-50 bg-emerald-800 text-emerald-100 px-4 py-3 rounded-lg text-sm font-medium text-center animate-fade-in">
           {toast}
         </div>
       )}

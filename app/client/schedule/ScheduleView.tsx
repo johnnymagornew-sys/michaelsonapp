@@ -119,20 +119,20 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
     <div className="flex flex-col min-h-full">
       {/* Subscription banner */}
       {subscription ? (
-        <div className="mx-4 mt-4 bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl px-4 py-3 flex items-center justify-between">
+        <div className="mx-4 mt-4 bg-[#1C1C1C] border-r-4 border-red-600 rounded-lg px-4 py-3 flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-500">מנוי פעיל</p>
-            <p className="text-sm font-semibold text-white">{SUBSCRIPTION_LABELS[subscription.type as keyof typeof SUBSCRIPTION_LABELS]}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">מנוי פעיל</p>
+            <p className="font-bold text-white">{SUBSCRIPTION_LABELS[subscription.type as keyof typeof SUBSCRIPTION_LABELS]}</p>
           </div>
           <div className="text-left">
             {subscription.type === '8_per_month' && (
               <p className="text-xs text-gray-400">{weeklyBooked}/2 השבוע</p>
             )}
-            <p className="text-xs text-gray-500 mt-0.5">{daysRemaining(subscription.end_date)} ימים נותרו</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-0.5">{daysRemaining(subscription.end_date)} ימים נותרו</p>
           </div>
         </div>
       ) : (
-        <div className="mx-4 mt-4 bg-amber-950/30 border border-amber-800/30 rounded-xl px-4 py-3">
+        <div className="mx-4 mt-4 bg-amber-950/30 border border-amber-800/30 rounded-lg px-4 py-3">
           <p className="text-amber-400 text-sm font-medium">לקביעת אימון יש ליצור קשר עם המאמן</p>
         </div>
       )}
@@ -142,12 +142,12 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={() => router.push(`/client/schedule?week=${weekOffset - 1}`)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors text-lg"
+            className="text-gray-400 text-2xl font-black hover:text-white transition-colors"
           >
             ›
           </button>
           <div className="text-center">
-            <h2 className="text-base font-bold text-white">
+            <h2 className="text-base font-black uppercase tracking-tight text-white">
               {weekOffset === 0 ? 'השבוע שלי' : weekOffset === 1 ? 'שבוע הבא' : weekOffset === -1 ? 'שבוע שעבר' : weekOffset > 0 ? `${weekOffset} שבועות קדימה` : `${Math.abs(weekOffset)} שבועות אחורה`}
             </h2>
             <p className="text-[11px] text-gray-500">
@@ -158,36 +158,26 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
           </div>
           <button
             onClick={() => router.push(`/client/schedule?week=${weekOffset + 1}`)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors text-lg"
+            className="text-gray-400 text-2xl font-black hover:text-white transition-colors"
           >
             ‹
           </button>
         </div>
-        <div className="grid grid-cols-7 gap-1">
+        <div className="flex justify-between items-start mb-4">
           {weekDates.map((dateStr, i) => {
             const date = new Date(dateStr + 'T00:00:00')
             const today = isToday(dateStr)
             const active = selectedDay === i
-            const dayOccs = occurrences.filter(o => o.date === dateStr)
-            const hasDot = dayOccs.length > 0
 
             return (
               <button
                 key={dateStr}
                 onClick={() => setSelectedDay(i)}
-                className={`flex flex-col items-center py-2 rounded-xl transition-colors ${
-                  active
-                    ? 'bg-red-600 text-white'
-                    : today
-                    ? 'bg-[#2a2a2a] text-white'
-                    : 'text-gray-500'
-                }`}
+                className="flex flex-col items-center gap-1"
               >
-                <span className="text-[10px] font-medium">{DAY_NAMES_SHORT[i]}</span>
-                <span className="text-base font-bold">{date.getDate()}</span>
-                {hasDot && !active && (
-                  <div className={`w-1 h-1 rounded-full mt-0.5 ${today ? 'bg-red-500' : 'bg-gray-600'}`} />
-                )}
+                <span className={`text-[10px] font-bold uppercase ${active ? 'text-red-600' : 'text-gray-500'}`}>{DAY_NAMES_SHORT[i]}</span>
+                <span className={`text-base font-black ${active ? 'text-red-600' : today ? 'text-white' : 'text-gray-500'}`}>{date.getDate()}</span>
+                <div className={`h-0.5 w-4 ${active ? 'bg-red-600' : 'bg-transparent'}`} />
               </button>
             )
           })}
@@ -196,7 +186,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
 
       {/* Classes list */}
       <div className="px-4 pt-2 pb-4 flex-1">
-        <p className="text-gray-500 text-xs mb-3 font-medium">
+        <p className="uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-3">
           {new Date(weekDates[selectedDay] + 'T00:00:00').toLocaleDateString('he-IL', {
             weekday: 'long', day: 'numeric', month: 'long'
           })}
@@ -204,7 +194,6 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
 
         {dayOccurrences.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <span className="text-4xl mb-3">🏖️</span>
             <p className="text-gray-500 font-medium">אין אימונים ביום זה</p>
           </div>
         ) : (
@@ -213,41 +202,42 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
               const status = getBookingStatus(occ)
               const bookingCount = occ.bookings?.filter((b: any) => !b.cancelled_at).length ?? 0
               const capacity = occ.override_capacity ?? occ.classes.max_capacity
+              const isActiveCard = !occ.is_cancelled && (status.isBooked || status.canBook)
 
               return (
                 <div
                   key={occ.id}
-                  className={`bg-[#1a1a1a] rounded-2xl overflow-hidden border ${
-                    status.isBooked ? 'border-emerald-800/50' : 'border-[#2a2a2a]'
+                  className={`bg-[#1C1C1C] rounded-lg overflow-hidden ${
+                    isActiveCard ? 'border-r-4 border-red-600' : 'border-r-4 border-[#2a2a2a]'
                   }`}
                 >
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${CLASS_TYPE_COLORS[occ.classes.type as keyof typeof CLASS_TYPE_COLORS]}`}>
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${CLASS_TYPE_COLORS[occ.classes.type as keyof typeof CLASS_TYPE_COLORS]}`}>
                             {occ.classes.type}
                           </span>
-                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${status.color}`}>
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${status.color}`}>
                             {status.label}
                           </span>
                         </div>
-                        <h3 className="font-bold text-white text-base truncate">{occ.classes.name}</h3>
+                        <h3 className="font-black text-white text-lg uppercase tracking-tight truncate">{occ.classes.name}</h3>
                         {(occ.classes.branch || occ.classes.coach) && (
                           <p className="text-gray-600 text-xs mt-0.5">{occ.classes.branch ?? ''}{occ.classes.coach ? ` · ${occ.classes.coach}` : ''}</p>
                         )}
                       </div>
                       <div className="text-left mr-3 shrink-0">
-                        <p className="text-white font-bold text-base">{formatTime(occ.classes.start_time)}</p>
-                        <p className="text-gray-500 text-xs">{occ.classes.duration_minutes} דק'</p>
+                        <p className="text-3xl font-black text-white">{formatTime(occ.classes.start_time)}</p>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase">{occ.classes.duration_minutes} דק'</p>
                       </div>
                     </div>
 
                     {/* Capacity bar */}
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="flex-1 h-1.5 bg-[#2a2a2a] rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-[#2a2a2a] rounded-none overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${
+                          className={`h-full rounded-none transition-all ${
                             bookingCount >= capacity ? 'bg-red-600' : 'bg-emerald-600'
                           }`}
                           style={{ width: `${Math.min(100, (bookingCount / capacity) * 100)}%` }}
@@ -261,9 +251,9 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                       <button
                         onClick={() => setBookingModal(occ)}
                         disabled={!status.canBook && !status.isBooked}
-                        className={`w-full py-3 rounded-xl font-bold text-sm transition-colors ${
+                        className={`w-full py-3 font-black uppercase tracking-tight text-sm rounded-lg transition-colors ${
                           status.isBooked
-                            ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-800/30'
+                            ? 'bg-[#1a2a1a] text-emerald-400 border border-emerald-800/40'
                             : status.canBook
                             ? 'bg-red-600 hover:bg-red-500 text-white active:scale-[0.98]'
                             : 'bg-[#242424] text-gray-600 cursor-not-allowed'
@@ -288,9 +278,9 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
           title={bookedSet.has(bookingModal.id) ? 'ביטול אימון' : 'הרשמה לאימון'}
         >
           <div className="space-y-4">
-            <div className="bg-[#242424] rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">{bookingModal.classes.type}</p>
-              <p className="text-white font-bold text-lg">{bookingModal.classes.name}</p>
+            <div className="bg-[#242424] rounded-lg p-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">{bookingModal.classes.type}</p>
+              <p className="text-white font-black uppercase tracking-tight text-lg">{bookingModal.classes.name}</p>
               <p className="text-gray-400 text-sm mt-1">
                 {new Date(bookingModal.date + 'T00:00:00').toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                 {' · '}
@@ -306,13 +296,13 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                     <button
                       onClick={() => handleCancel(bookingModal)}
                       disabled={actionLoading}
-                      className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-colors"
+                      className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-tight rounded-lg transition-colors"
                     >
                       {actionLoading ? 'מבטל...' : 'כן, בטל הרשמה'}
                     </button>
                   </>
                 ) : (
-                  <div className="bg-amber-950/30 border border-amber-800/30 rounded-xl p-4 text-center">
+                  <div className="bg-amber-950/30 border border-amber-800/30 rounded-lg p-4 text-center">
                     <p className="text-amber-400 font-medium text-sm">
                       לא ניתן לבטל פחות מ-24 שעות לפני האימון
                     </p>
@@ -325,7 +315,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                 <button
                   onClick={() => handleBook(bookingModal)}
                   disabled={actionLoading}
-                  className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-colors"
+                  className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-tight rounded-lg transition-colors"
                 >
                   {actionLoading ? 'מאשר...' : '✓ אשר הרשמה'}
                 </button>
@@ -337,7 +327,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-20 right-4 left-4 z-50 px-4 py-3 rounded-xl text-sm font-medium text-center animate-fade-in ${
+        <div className={`fixed top-20 right-4 left-4 z-50 px-4 py-3 rounded-lg text-sm font-medium text-center animate-fade-in ${
           toast.type === 'success' ? 'bg-emerald-800 text-emerald-100' : 'bg-red-900 text-red-100'
         }`}>
           {toast.msg}
