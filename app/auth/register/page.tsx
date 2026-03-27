@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import AvatarCropper from '@/components/ui/AvatarCropper'
 
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     full_name: '',
@@ -30,8 +32,14 @@ export default function RegisterPage() {
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setAvatarFile(file)
-    setAvatarPreview(URL.createObjectURL(file))
+    setCropSrc(URL.createObjectURL(file))
+    e.target.value = ''
+  }
+
+  function handleCropDone(blob: Blob) {
+    setAvatarBlob(blob)
+    setAvatarPreview(URL.createObjectURL(blob))
+    setCropSrc(null)
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -62,12 +70,11 @@ export default function RegisterPage() {
     }
 
     // Upload avatar if selected
-    if (avatarFile && data.user) {
-      const ext = avatarFile.name.split('.').pop()
-      const path = `${data.user.id}/avatar.${ext}`
+    if (avatarBlob && data.user) {
+      const path = `${data.user.id}/avatar.jpg`
       const { data: uploadData } = await supabase.storage
         .from('avatars')
-        .upload(path, avatarFile, { upsert: true })
+        .upload(path, avatarBlob, { upsert: true, contentType: 'image/jpeg' })
 
       if (uploadData) {
         const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
@@ -83,6 +90,13 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-dvh bg-[#0f0f0f] flex flex-col px-5 py-10">
+      {cropSrc && (
+        <AvatarCropper
+          imageSrc={cropSrc}
+          onCrop={handleCropDone}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
       {/* Header */}
       <div className="text-center mb-8">
         <Image src="/logo_new.png" alt="Michaelson Brothers MMA" width={180} height={65} className="object-contain mx-auto mb-3" />

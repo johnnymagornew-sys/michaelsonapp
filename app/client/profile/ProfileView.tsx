@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Profile, Subscription, SUBSCRIPTION_LABELS, BELT_LABELS, BELT_COLORS, BELT_ORDER, Belt } from '@/types'
 import BeltIcon from '@/components/ui/BeltIcon'
+import AvatarCropper from '@/components/ui/AvatarCropper'
 import { formatDateHebrew, daysRemaining, isSubscriptionActive } from '@/lib/utils/dates'
 
 interface Props {
@@ -20,6 +21,7 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>((profile as any)?.avatar_url ?? null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
 
   const activeSub = subscriptions.find(s => isSubscriptionActive(s))
 
@@ -29,13 +31,19 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
     router.refresh()
   }
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !profile) return
+    if (!file) return
+    setCropSrc(URL.createObjectURL(file))
+    e.target.value = ''
+  }
+
+  async function handleCropDone(blob: Blob) {
+    if (!profile) return
+    setCropSrc(null)
     setUploadingAvatar(true)
-    const ext = file.name.split('.').pop()
-    const path = `${profile.id}/avatar.${ext}`
-    const { data: uploadData } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+    const path = `${profile.id}/avatar.jpg`
+    const { data: uploadData } = await supabase.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
     if (uploadData) {
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
       const newUrl = urlData.publicUrl + '?t=' + Date.now()
@@ -51,6 +59,14 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
 
   return (
     <div className="px-4 py-5 space-y-5">
+      {cropSrc && (
+        <AvatarCropper
+          imageSrc={cropSrc}
+          onCrop={handleCropDone}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
+
       {/* Profile hero */}
       <div className="flex items-center gap-4">
         <button
@@ -76,7 +92,7 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
             )}
           </div>
         </button>
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
         <div>
           <h1 className="text-xl font-black text-white">{profile?.full_name}</h1>
           <p className="text-gray-500 text-sm">{email}</p>
