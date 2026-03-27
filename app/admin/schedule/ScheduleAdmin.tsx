@@ -116,6 +116,23 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
     }
   }
 
+  async function cancelAllFutureOccurrences(occ: any) {
+    setLoading(true)
+    const { error } = await supabase
+      .from('class_occurrences')
+      .update({ is_cancelled: true })
+      .eq('class_id', occ.class_id)
+      .gte('date', occ.date)
+    setLoading(false)
+    setOccModal(null)
+    if (error) {
+      showToast('שגיאה', 'error')
+    } else {
+      showToast('כל השיעורים הקרובים בוטלו', 'success')
+      startTransition(() => router.refresh())
+    }
+  }
+
   async function deleteClass(classId: string) {
     if (!confirm('למחוק את השיעור? כל ההזמנות יבוטלו.')) return
     setLoading(true)
@@ -460,17 +477,43 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
                 )}
               </div>
 
-              <button
-                onClick={() => toggleCancelOccurrence(occModal.occ)}
-                disabled={loading}
-                className={`w-full py-3 font-bold rounded-xl text-sm ${
-                  occModal.occ.is_cancelled
-                    ? 'bg-emerald-700 hover:bg-emerald-600 text-white'
-                    : 'bg-[#2a2a2a] hover:bg-[#333] text-amber-400 border border-amber-800/40'
-                }`}
-              >
-                {loading ? '...' : occModal.occ.is_cancelled ? 'שחזר שיעור' : 'בטל שיעור זה'}
-              </button>
+              {occModal.occ.is_cancelled ? (
+                <button
+                  onClick={() => toggleCancelOccurrence(occModal.occ)}
+                  disabled={loading}
+                  className="w-full py-3 font-bold rounded-xl text-sm bg-emerald-700 hover:bg-emerald-600 text-white"
+                >
+                  {loading ? '...' : 'שחזר שיעור'}
+                </button>
+              ) : occModal.cls.is_recurring ? (
+                <div className="space-y-2">
+                  <p className="text-gray-500 text-xs text-center">שיעור חוזר — מה לבטל?</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => toggleCancelOccurrence(occModal.occ)}
+                      disabled={loading}
+                      className="py-3 font-bold rounded-xl text-sm bg-[#2a2a2a] hover:bg-[#333] text-amber-400 border border-amber-800/40"
+                    >
+                      {loading ? '...' : 'שיעור זה בלבד'}
+                    </button>
+                    <button
+                      onClick={() => cancelAllFutureOccurrences(occModal.occ)}
+                      disabled={loading}
+                      className="py-3 font-bold rounded-xl text-sm bg-red-950/40 hover:bg-red-950/60 text-red-400 border border-red-800/40"
+                    >
+                      {loading ? '...' : 'כל השיעורים'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => toggleCancelOccurrence(occModal.occ)}
+                  disabled={loading}
+                  className="w-full py-3 font-bold rounded-xl text-sm bg-[#2a2a2a] hover:bg-[#333] text-amber-400 border border-amber-800/40"
+                >
+                  {loading ? '...' : 'בטל שיעור זה'}
+                </button>
+              )}
             </div>
           </Modal>
         )
