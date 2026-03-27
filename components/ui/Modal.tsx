@@ -29,17 +29,17 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
         onClick={onClose}
       />
       {/* Sheet */}
-      <div className="relative w-full max-w-lg bg-[#141414] rounded-t-lg animate-slide-up max-h-[90dvh] overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-[#1e1e1e] rounded-t-lg animate-slide-up max-h-[90dvh] overflow-y-auto">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-[#2a2a2a] rounded" />
+          <div className="w-10 h-1 bg-[#444] rounded" />
         </div>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pb-4 pt-2 border-b border-[#242424]">
+        <div className="flex items-center justify-between px-5 pb-4 pt-2 border-b border-white/10">
           <h2 className="text-lg font-black uppercase tracking-tight text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded bg-[#2e2e2e] text-gray-400 hover:text-white transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded bg-[#333] text-gray-300 hover:text-white transition-colors"
           >
             ✕
           </button>

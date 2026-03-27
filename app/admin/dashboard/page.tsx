@@ -70,7 +70,7 @@ export default async function AdminDashboard() {
       {/* Reports link */}
       <Link
         href="/admin/reports"
-        className="w-full flex items-center justify-between bg-[#1C1C1C] border border-[#2a2a2a] hover:border-blue-800/50 rounded-lg px-4 py-4 transition-colors group"
+        className="w-full flex items-center justify-between bg-[#1e1e1e] border border-white/10 hover:border-blue-800/50 rounded-lg px-4 py-4 transition-colors group"
       >
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-blue-700 rounded-lg flex items-center justify-center text-white text-lg">
@@ -86,9 +86,9 @@ export default async function AdminDashboard() {
 
       {/* Today's classes */}
       <div>
-        <h2 className="font-black uppercase tracking-tight text-lg text-white mb-3">אימונים היום</h2>
+        <h2 className="font-black uppercase tracking-tight text-lg text-white border-b border-white/10 pb-2 mb-3">אימונים היום</h2>
         {!todayClasses || todayClasses.length === 0 ? (
-          <div className="bg-[#1C1C1C] border border-[#2a2a2a] rounded-lg p-6 text-center">
+          <div className="bg-[#1e1e1e] border border-white/8 rounded-lg p-6 text-center">
             <p className="text-gray-500">אין אימונים מתוכננים להיום</p>
           </div>
         ) : (
@@ -100,7 +100,7 @@ export default async function AdminDashboard() {
               const isFull = bookingCount >= capacity
 
               return (
-                <div key={occ.id} className={`bg-[#1C1C1C] rounded-lg p-4 ${occ.is_cancelled ? 'opacity-60 border-r-4 border-[#2a2a2a]' : isFull ? 'border-r-4 border-red-600' : 'border-r-4 border-[#2a2a2a]'}`}>
+                <div key={occ.id} className={`bg-[#1e1e1e] rounded-lg p-4 border border-white/8 ${occ.is_cancelled ? 'opacity-60 border-r-4 border-white/8' : isFull ? 'border-r-4 border-red-600' : 'border-r-4 border-white/8'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -112,7 +112,7 @@ export default async function AdminDashboard() {
                         )}
                       </div>
                       <p className="text-white font-bold">{cls.name}</p>
-                      <p className="text-gray-400 text-sm">{formatTime(cls.start_time)}</p>
+                      <p className="text-gray-300 text-sm">{formatTime(cls.start_time)}</p>
                     </div>
                     <div className="text-left">
                       <p className={`text-4xl font-black ${isFull ? 'text-red-500' : 'text-white'}`}>
@@ -121,7 +121,7 @@ export default async function AdminDashboard() {
                       <p className="text-gray-500 text-xs">/ {capacity}</p>
                     </div>
                   </div>
-                  <div className="mt-3 h-1.5 bg-[#2a2a2a] rounded-none overflow-hidden">
+                  <div className="mt-3 h-1.5 bg-[#333] rounded-none overflow-hidden">
                     <div
                       className={`h-full rounded-none ${isFull ? 'bg-red-600' : 'bg-emerald-600'}`}
                       style={{ width: `${Math.min(100, (bookingCount / capacity) * 100)}%` }}
@@ -147,13 +147,13 @@ function StatCard({ label, value, href }: { label: string; value: number; href?:
   )
   if (href) {
     return (
-      <Link href={href} className="bg-[#1C1C1C] rounded-lg p-4 border-r-4 border-red-700 block active:opacity-80">
+      <Link href={href} className="bg-[#1e1e1e] rounded-lg p-4 border-r-4 border-red-700 block active:opacity-80">
         {inner}
       </Link>
     )
   }
   return (
-    <div className="bg-[#1C1C1C] rounded-lg p-4 border-r-4 border-[#2a2a2a]">
+    <div className="bg-[#1e1e1e] rounded-lg p-4 border-r-4 border-white/8">
       {inner}
     </div>
   )

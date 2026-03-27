@@ -47,8 +47,8 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
 
       {upcoming.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-gray-500 font-medium">אין אימונים קרובים</p>
-          <p className="text-gray-600 text-sm mt-1">הרשם לאימון במערכת השעות</p>
+          <p className="text-gray-400 font-medium">אין אימונים קרובים</p>
+          <p className="text-gray-500 text-sm mt-1">הרשם לאימון במערכת השעות</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -63,8 +63,8 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
             return (
               <div
                 key={booking.id}
-                className={`bg-[#1C1C1C] rounded-lg overflow-hidden ${
-                  isCancelled ? 'opacity-50 border-r-4 border-[#2a2a2a]' : 'border-r-4 border-red-600'
+                className={`bg-[#1e1e1e] border border-white/8 rounded-lg overflow-hidden ${
+                  isCancelled ? 'opacity-50 border-r-4 border-white/8' : 'border-r-4 border-red-600'
                 }`}
               >
                 <div className="p-4">
@@ -80,16 +80,16 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-black uppercase tracking-tight text-base text-white">{cls.name}</h3>
-                      <p className="text-gray-400 text-sm mt-1">
+                      <h3 className="font-black text-white uppercase tracking-tight text-base">{cls.name}</h3>
+                      <p className="text-gray-300 text-sm mt-1">
                         {date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                         {' · '}
                         {formatTime(cls.start_time)}
                       </p>
                     </div>
                     <div className="text-left mr-3">
-                      <div className="text-center bg-[#242424] rounded-lg px-3 py-2">
-                        <p className="text-xs text-gray-500">{date.toLocaleDateString('he-IL', { month: 'short' })}</p>
+                      <div className="text-center bg-[#2a2a2a] rounded-lg px-3 py-2">
+                        <p className="text-xs text-gray-400">{date.toLocaleDateString('he-IL', { month: 'short' })}</p>
                         <p className="text-2xl font-black text-white leading-none">{date.getDate()}</p>
                       </div>
                     </div>
@@ -100,7 +100,7 @@ export default function MyBookingsView({ upcoming, userId }: Props) {
                       onClick={() => setCancelModal(booking)}
                       className={`w-full mt-3 py-3 rounded-lg text-xs font-bold uppercase transition-colors ${
                         canCancel
-                          ? 'bg-[#242424] text-red-400 hover:bg-red-950/30'
+                          ? 'bg-[#2a2a2a] text-red-400 border border-red-800/30 hover:bg-red-950/30'
                           : 'bg-[#1e1e1e] text-gray-600 cursor-not-allowed'
                       }`}
                       disabled={!canCancel}

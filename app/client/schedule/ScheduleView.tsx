@@ -150,7 +150,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
             <h2 className="text-base font-black uppercase tracking-tight text-white">
               {weekOffset === 0 ? 'השבוע שלי' : weekOffset === 1 ? 'שבוע הבא' : weekOffset === -1 ? 'שבוע שעבר' : weekOffset > 0 ? `${weekOffset} שבועות קדימה` : `${Math.abs(weekOffset)} שבועות אחורה`}
             </h2>
-            <p className="text-[11px] text-gray-500">
+            <p className="text-[11px] text-gray-300">
               {new Date(weekDates[0] + 'T00:00:00').toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
               {' — '}
               {new Date(weekDates[6] + 'T00:00:00').toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
@@ -176,7 +176,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                 className="flex flex-col items-center gap-1"
               >
                 <span className={`text-[10px] font-bold uppercase ${active ? 'text-red-600' : 'text-gray-500'}`}>{DAY_NAMES_SHORT[i]}</span>
-                <span className={`text-base font-black ${active ? 'text-red-600' : today ? 'text-white' : 'text-gray-500'}`}>{date.getDate()}</span>
+                <span className={`text-base font-black ${active ? 'text-red-600' : today ? 'text-white' : 'text-gray-400'}`}>{date.getDate()}</span>
                 <div className={`h-0.5 w-4 ${active ? 'bg-red-600' : 'bg-transparent'}`} />
               </button>
             )
@@ -186,7 +186,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
 
       {/* Classes list */}
       <div className="px-4 pt-2 pb-4 flex-1">
-        <p className="uppercase tracking-widest text-[10px] font-bold text-gray-500 mb-3">
+        <p className="uppercase tracking-widest text-[10px] font-bold text-gray-400 mb-3">
           {new Date(weekDates[selectedDay] + 'T00:00:00').toLocaleDateString('he-IL', {
             weekday: 'long', day: 'numeric', month: 'long'
           })}
@@ -207,8 +207,8 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
               return (
                 <div
                   key={occ.id}
-                  className={`bg-[#1C1C1C] rounded-lg overflow-hidden ${
-                    isActiveCard ? 'border-r-4 border-red-600' : 'border-r-4 border-[#2a2a2a]'
+                  className={`bg-[#1e1e1e] rounded-lg overflow-hidden ${
+                    isActiveCard ? 'border-r-4 border-red-600' : 'border-r-4 border-white/8'
                   }`}
                 >
                   <div className="p-4">
@@ -224,7 +224,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                         </div>
                         <h3 className="font-black text-white text-lg uppercase tracking-tight truncate">{occ.classes.name}</h3>
                         {(occ.classes.branch || occ.classes.coach) && (
-                          <p className="text-gray-600 text-xs mt-0.5">{occ.classes.branch ?? ''}{occ.classes.coach ? ` · ${occ.classes.coach}` : ''}</p>
+                          <p className="text-gray-400 text-xs mt-0.5">{occ.classes.branch ?? ''}{occ.classes.coach ? ` · ${occ.classes.coach}` : ''}</p>
                         )}
                       </div>
                       <div className="text-left mr-3 shrink-0">
@@ -235,7 +235,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
 
                     {/* Capacity bar */}
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="flex-1 h-1.5 bg-[#2a2a2a] rounded-none overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-[#333] rounded-none overflow-hidden">
                         <div
                           className={`h-full rounded-none transition-all ${
                             bookingCount >= capacity ? 'bg-red-600' : 'bg-emerald-600'
@@ -243,7 +243,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                           style={{ width: `${Math.min(100, (bookingCount / capacity) * 100)}%` }}
                         />
                       </div>
-                      <span className="text-xs text-gray-500 shrink-0">{bookingCount}/{capacity}</span>
+                      <span className="text-xs text-gray-400 shrink-0">{bookingCount}/{capacity}</span>
                     </div>
 
                     {/* Action button */}
@@ -256,7 +256,7 @@ export default function ScheduleView({ occurrences, subscription, myBookings, we
                             ? 'bg-[#1a2a1a] text-emerald-400 border border-emerald-800/40'
                             : status.canBook
                             ? 'bg-red-600 hover:bg-red-500 text-white active:scale-[0.98]'
-                            : 'bg-[#242424] text-gray-600 cursor-not-allowed'
+                            : 'bg-[#2a2a2a] text-gray-500 cursor-not-allowed'
                         }`}
                       >
                         {status.isBooked ? '✓ רשום — לחץ לביטול' : status.canBook ? 'הרשמה לאימון' : 'לא זמין'}

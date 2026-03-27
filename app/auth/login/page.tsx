@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#0f0f0f] flex flex-col items-center justify-center px-5">
+    <div className="min-h-dvh bg-gradient-to-b from-[#141414] to-[#0f0f0f] flex flex-col items-center justify-center px-5">
       {/* Logo */}
       <div className="text-center mb-10">
         <Image src="/logo_new.png" alt="Michaelson Brothers MMA" width={200} height={70} className="object-contain mx-auto mb-4" />
@@ -50,28 +50,28 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block uppercase tracking-widest text-xs font-bold text-gray-500 mb-2">אימייל</label>
+            <label className="block uppercase tracking-widest text-xs font-bold text-gray-300 mb-2">אימייל</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full bg-[#141414] border-0 border-b-2 border-[#2a2a2a] focus:border-red-600 rounded-none px-0 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors"
+              className="w-full bg-[#141414] border-0 border-b-2 border-[#444] focus:border-red-600 rounded-none px-0 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors"
               placeholder="your@email.com"
               dir="ltr"
             />
           </div>
 
           <div>
-            <label className="block uppercase tracking-widest text-xs font-bold text-gray-500 mb-2">סיסמה</label>
+            <label className="block uppercase tracking-widest text-xs font-bold text-gray-300 mb-2">סיסמה</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full bg-[#141414] border-0 border-b-2 border-[#2a2a2a] focus:border-red-600 rounded-none px-0 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors"
+              className="w-full bg-[#141414] border-0 border-b-2 border-[#444] focus:border-red-600 rounded-none px-0 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors"
               placeholder="••••••••"
               dir="ltr"
             />
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-gray-400 text-sm mt-6">
           אין לך חשבון?{' '}
           <Link href="/auth/register" className="text-red-500 font-medium">
             הרשמה

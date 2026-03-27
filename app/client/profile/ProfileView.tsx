@@ -106,8 +106,8 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
         const c = BELT_COLORS[belt]
         const beltIdx = BELT_ORDER.indexOf(belt)
         return (
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-4">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">דרגת חגורה</p>
+          <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl p-4">
+            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3">דרגת חגורה</p>
             <div className="flex items-center gap-4">
               <BeltIcon belt={belt} size="lg" />
               <div className="flex-1">
@@ -126,13 +126,13 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-4 text-center">
+        <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl p-4 text-center">
           <p className="text-3xl font-black text-red-500">{totalAttended}</p>
-          <p className="text-gray-500 text-xs mt-1">אימונים שהושלמו</p>
+          <p className="text-gray-400 text-xs mt-1">אימונים שהושלמו</p>
         </div>
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-4 text-center">
+        <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl p-4 text-center">
           <p className="text-3xl font-black text-white">{activeSub ? daysRemaining(activeSub.end_date) : '—'}</p>
-          <p className="text-gray-500 text-xs mt-1">ימים נותרו במנוי</p>
+          <p className="text-gray-400 text-xs mt-1">ימים נותרו במנוי</p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
       <div>
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">מנוי</h2>
         {activeSub ? (
-          <div className="bg-gradient-to-br from-red-900/50 to-red-950/30 border border-red-800/30 rounded-2xl p-4">
+          <div className="bg-gradient-to-br from-red-900/50 to-red-950/30 border border-red-700/50 rounded-2xl p-4">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs text-red-400 font-semibold uppercase tracking-wide">מנוי פעיל</p>
@@ -154,9 +154,9 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
             </div>
           </div>
         ) : (
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-4">
-            <p className="text-gray-500 font-medium text-center">אין מנוי פעיל</p>
-            <p className="text-gray-600 text-sm text-center mt-1">לרכישת מנוי יש ליצור קשר עם המאמן</p>
+          <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl p-4">
+            <p className="text-gray-400 font-medium text-center">אין מנוי פעיל</p>
+            <p className="text-gray-500 text-sm text-center mt-1">לרכישת מנוי יש ליצור קשר עם המאמן</p>
           </div>
         )}
       </div>
@@ -164,22 +164,22 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
       {/* Personal info */}
       <div>
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">פרטים אישיים</h2>
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl divide-y divide-[#2a2a2a]">
+        <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl divide-y divide-white/10">
           {profile?.phone && (
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-gray-500 text-sm">טלפון</span>
+              <span className="text-gray-400 text-sm">טלפון</span>
               <span className="text-white text-sm font-medium" dir="ltr">{profile.phone}</span>
             </div>
           )}
           {profile?.date_of_birth && (
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-gray-500 text-sm">תאריך לידה</span>
+              <span className="text-gray-400 text-sm">תאריך לידה</span>
               <span className="text-white text-sm font-medium">{formatDateHebrew(profile.date_of_birth)}</span>
             </div>
           )}
           {profile?.medical_notes && (
             <div className="px-4 py-3">
-              <span className="text-gray-500 text-sm block mb-1">הערות רפואיות</span>
+              <span className="text-gray-400 text-sm block mb-1">הערות רפואיות</span>
               <span className="text-white text-sm">{profile.medical_notes}</span>
             </div>
           )}
@@ -187,7 +187,7 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
       </div>
 
       {/* Logout */}
-      <button onClick={handleLogout} className="w-full py-4 border border-[#2e2e2e] text-red-500 font-semibold rounded-2xl hover:bg-red-950/20 transition-colors">
+      <button onClick={handleLogout} className="w-full py-4 border border-white/10 text-red-500 font-semibold rounded-2xl hover:bg-red-950/20 transition-colors">
         התנתקות
       </button>
     </div>

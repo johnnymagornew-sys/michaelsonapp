@@ -52,7 +52,7 @@ export default function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 h-16 bg-[#0a0a0a]/95 border-t border-[#1e1e1e]"
+    <nav className="fixed bottom-0 inset-x-0 z-40 h-16 bg-[#111]/95 border-t border-white/10"
          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="flex h-16">
         {tabs.map(tab => {
@@ -62,7 +62,7 @@ export default function BottomNav() {
               key={tab.href}
               href={tab.href}
               className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors ${
-                active ? 'text-red-600 border-t-2 border-red-600 pt-2' : 'text-gray-600 pt-2'
+                active ? 'text-red-600 border-t-2 border-red-600 pt-2' : 'text-gray-500 hover:text-gray-300 pt-2'
               }`}
             >
               {tab.icon(active)}
