@@ -36,6 +36,7 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
   const [tab, setTab] = useState<'week' | 'classes'>('week')
   const [enrollments, setEnrollments] = useState<any[]>(initialEnrollments)
   const [enrollTab, setEnrollTab] = useState<'enrolled' | 'add'>('enrolled')
+  const [pendingEnroll, setPendingEnroll] = useState<any>(null)
 
   const todayStr = new Date().toISOString().split('T')[0]
   const [classForm, setClassForm] = useState({
@@ -85,6 +86,17 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
         await supabase.from('bookings').upsert(bookings, { onConflict: 'user_id,occurrence_id', ignoreDuplicates: true })
       }
       showToast('התלמיד שובץ קבוע', 'success')
+    }
+  }
+
+  async function addSingleBooking(userId: string, occurrenceId: string) {
+    const { error } = await supabase
+      .from('bookings')
+      .upsert({ user_id: userId, occurrence_id: occurrenceId }, { onConflict: 'user_id,occurrence_id', ignoreDuplicates: true })
+    setPendingEnroll(null)
+    if (!error) {
+      showToast('התלמיד נרשם לאימון זה', 'success')
+      startTransition(() => router.refresh())
     }
   }
 
@@ -579,7 +591,7 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
                               </div>
                               <span className="text-white text-sm flex-1 truncate">{user.full_name}</span>
                               <button
-                                onClick={() => addPermanentEnrollment(user.id, occModal.cls.id)}
+                                onClick={() => setPendingEnroll(user)}
                                 className="text-emerald-400 text-xs font-bold px-2 py-1 rounded-lg bg-emerald-900/20 hover:bg-emerald-900/40"
                               >
                                 שבץ
@@ -592,6 +604,36 @@ export default function ScheduleAdmin({ classes, occurrences, upcomingOccurrence
                   </div>
                 )
               })()}
+
+              {/* Enrollment choice dialog */}
+              {pendingEnroll && (
+                <div className="bg-[#1e1e1e] border border-[#3a3a3a] rounded-2xl p-4 space-y-3">
+                  <div className="text-center">
+                    <p className="text-white font-bold text-sm">{pendingEnroll.full_name}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">לשבץ לאיזה אימון?</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => addSingleBooking(pendingEnroll.id, occModal.occ.id)}
+                      className="py-3 rounded-xl text-xs font-bold bg-[#2a2a2a] hover:bg-[#333] text-amber-400 border border-amber-800/40"
+                    >
+                      אימון זה בלבד
+                    </button>
+                    <button
+                      onClick={() => { addPermanentEnrollment(pendingEnroll.id, occModal.cls.id); setPendingEnroll(null) }}
+                      className="py-3 rounded-xl text-xs font-bold bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/40"
+                    >
+                      כל האימונים
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setPendingEnroll(null)}
+                    className="w-full text-gray-600 text-xs py-1"
+                  >
+                    ביטול
+                  </button>
+                </div>
+              )}
 
               {occModal.occ.is_cancelled ? (
                 <button
