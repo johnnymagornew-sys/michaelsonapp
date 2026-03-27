@@ -35,6 +35,7 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
     start_date: today,
     end_date: '',
     age_group: 'כולם' as AgeGroup,
+    no_expiry: false,
   })
 
   const showToast = (msg: string, type: 'success' | 'error') => {
@@ -72,20 +73,23 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
   function openSubModal(user: any) {
     setSelectedUser(user)
     if (user.subscription) {
+      const noExpiry = user.subscription.end_date >= '2099-01-01'
       setSubForm({
         type: user.subscription.type,
         start_date: user.subscription.start_date,
-        end_date: user.subscription.end_date,
+        end_date: noExpiry ? '' : user.subscription.end_date,
         age_group: user.subscription.age_group ?? 'כולם',
+        no_expiry: noExpiry,
       })
     } else {
-      setSubForm({ type: '8_per_month', start_date: today, end_date: '', age_group: 'כולם' })
+      setSubForm({ type: '8_per_month', start_date: today, end_date: '', age_group: 'כולם', no_expiry: false })
     }
     setSubModal(true)
   }
 
   async function saveSub() {
-    if (!selectedUser || !subForm.end_date) return
+    const effectiveEndDate = subForm.no_expiry ? '2099-12-31' : subForm.type === 'single_class' ? subForm.start_date : subForm.end_date
+    if (!selectedUser || !effectiveEndDate) return
     setLoading(true)
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -99,7 +103,7 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
         .update({
           type: subForm.type,
           start_date: subForm.start_date,
-          end_date: subForm.end_date,
+          end_date: effectiveEndDate,
           age_group: subForm.age_group,
           assigned_by: user?.id,
         })
@@ -113,7 +117,7 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
           user_id: selectedUser.id,
           type: subForm.type,
           start_date: subForm.start_date,
-          end_date: subForm.end_date,
+          end_date: effectiveEndDate,
           age_group: subForm.age_group,
           assigned_by: user?.id,
         })
@@ -547,6 +551,7 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
               >
                 <option value="8_per_month">8 אימונים בחודש</option>
                 <option value="unlimited_monthly">חופשי חודשי</option>
+                <option value="single_class">אימון בודד</option>
               </select>
             </div>
 
@@ -561,16 +566,39 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1.5">תאריך סיום</label>
-              <input
-                type="date"
-                value={subForm.end_date}
-                onChange={e => setSubForm(f => ({ ...f, end_date: e.target.value }))}
-                className={inputClass}
-                dir="ltr"
-              />
-            </div>
+            {subForm.type === 'single_class' ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">תאריך האימון</label>
+                <div className={`${inputClass} text-gray-400`} dir="ltr">{subForm.start_date}</div>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-gray-400">תאריך סיום</label>
+                  <button
+                    type="button"
+                    onClick={() => setSubForm(f => ({ ...f, no_expiry: !f.no_expiry, end_date: f.no_expiry ? '' : f.end_date }))}
+                    className={`flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded transition-colors ${
+                      subForm.no_expiry ? 'bg-red-600/20 text-red-400 border border-red-600/40' : 'bg-[#2a2a2a] text-gray-500 border border-[#3a3a3a]'
+                    }`}
+                  >
+                    <span>{subForm.no_expiry ? '✓' : '○'}</span>
+                    ללא תוקף
+                  </button>
+                </div>
+                {subForm.no_expiry ? (
+                  <div className={`${inputClass} text-gray-500`}>ללא הגבלה</div>
+                ) : (
+                  <input
+                    type="date"
+                    value={subForm.end_date}
+                    onChange={e => setSubForm(f => ({ ...f, end_date: e.target.value }))}
+                    className={inputClass}
+                    dir="ltr"
+                  />
+                )}
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-1.5">קבוצת גיל</label>
@@ -592,7 +620,7 @@ export default function UsersView({ users, today, recurringClasses, initialFilte
 
             <button
               onClick={saveSub}
-              disabled={loading || !subForm.end_date}
+              disabled={loading || (!subForm.no_expiry && subForm.type !== 'single_class' && !subForm.end_date)}
               className="w-full py-4 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold rounded-xl transition-colors"
             >
               {loading ? 'שומר...' : 'שמור מנוי'}

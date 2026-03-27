@@ -131,7 +131,7 @@ export default function ProfileView({ profile, subscriptions, email, totalAttend
           <p className="text-gray-400 text-xs mt-1">אימונים שהושלמו</p>
         </div>
         <div className="bg-[#1e1e1e] border border-white/8 rounded-2xl p-4 text-center">
-          <p className="text-3xl font-black text-white">{activeSub ? daysRemaining(activeSub.end_date) : '—'}</p>
+          <p className="text-3xl font-black text-white">{activeSub ? (activeSub.end_date >= '2099-01-01' ? '∞' : daysRemaining(activeSub.end_date)) : '—'}</p>
           <p className="text-gray-400 text-xs mt-1">ימים נותרו במנוי</p>
         </div>
       </div>

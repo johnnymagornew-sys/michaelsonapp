@@ -26,7 +26,7 @@ export const BELT_COLORS: Record<Belt, { bg: string; bar: string; text: string }
 
 export const BELT_ORDER: Belt[] = ['white', 'yellow', 'orange', 'green', 'blue', 'purple', 'brown', 'black']
 
-export type SubscriptionType = '8_per_month' | 'unlimited_monthly'
+export type SubscriptionType = '8_per_month' | 'unlimited_monthly' | 'single_class'
 
 export type ClassType = 'MMA' | 'בוקסינג' | 'BJJ'
 
@@ -164,6 +164,7 @@ export const CLASS_TYPE_COLORS: Record<ClassType, string> = {
 export const SUBSCRIPTION_LABELS: Record<SubscriptionType, string> = {
   '8_per_month': '8 אימונים בחודש',
   'unlimited_monthly': 'חופשי חודשי',
+  'single_class': 'אימון בודד',
 }
 
 export const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת']
